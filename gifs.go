@@ -23,7 +23,21 @@ var (
 
 	errUnimplemented  = errors.New("unimplemented")
 	errIllogicalState = errors.New("illogical and unexpected state")
+
+	// If set, enables debug logging.
+	debug = os.Getenv("DEBUG_GIFS_PKG") != ""
 )
+
+const (
+	importEndpointURL             = "https://api.gifs.com/media/import"
+	defaultConcurrentImportsCount = 10
+)
+
+func debugLogPrintf(s string, args ...interface{}) {
+	if debug {
+		log.Printf("[gifs] "+s, args...)
+	}
+}
 
 type MediaType uint
 
@@ -50,46 +64,29 @@ func (mt MediaType) String() string {
 	return mt.Extension()
 }
 
-var (
-	debug = os.Getenv("DEBUG_GIFS_PKG") != ""
-)
-
-const (
-	importEndpointURL = "https://api.gifs.com/media/import"
-)
-
-var (
-	defaultConcurrentImportsCount = uint64(10)
-)
-
-func debugLogPrintf(fmt_ string, args ...interface{}) {
-	if debug {
-		log.Printf(fmt_, args...)
-	}
-}
-
 type Credentials struct {
 	APIKey string `json:"api_key,omitempty"`
 }
 
-type GIFS struct {
+type Client struct {
 	client *http.Client
-	apiKey string
 
-	mu sync.Mutex
+	// mu guards access to apiKey
+	mu     sync.Mutex
+	apiKey string
 }
 
-func (g *GIFS) SetAPIKey(apiKey string) {
+func (g *Client) SetAPIKey(apiKey string) {
 	g.mu.Lock()
 	g.apiKey = apiKey
 	g.mu.Unlock()
 }
 
-func New() (*GIFS, error) {
-	return new(GIFS), nil
+func New() (*Client, error) {
+	return &Client{}, nil
 }
 
-func NewWithCredentials(cred *Credentials) (*GIFS, error) {
+func NewWithCredentials(cred *Credentials) (*Client, error) {
 	g, err := New()
 	if err != nil {
 		return nil, err
@@ -105,7 +102,7 @@ type Trim struct {
 	End   float64 `json:"end,omitempty"`
 }
 
-type Params struct {
+type Request struct {
 	Title  string   `json:"title,omitempty"`
 	URL    string   `json:"source,omitempty"`
 	APIKey string   `json:"api_key,omitempty"`
@@ -121,7 +118,7 @@ type Params struct {
 	callbackURI string `json:"-"`
 }
 
-func (p *Params) SetMedia(r io.Reader) error {
+func (p *Request) SetMedia(r io.Reader) error {
 	if p == nil {
 		return ErrNilParamDereference
 	}
@@ -173,20 +170,20 @@ func (res Response) File(mt MediaType) string {
 	return res.Files[mt.Extension()]
 }
 
-func (g *GIFS) Upload() (*Response, error) {
+func (g *Client) Upload() (*Response, error) {
 	return nil, errUnimplemented
 }
 
 // Import is a method with which you'll specify atleast
 // an http based URL pointing to media that you'd like
 // to import to gifs.com.
-func (g *GIFS) Import(param *Params) (*Response, error) {
-	if param == nil {
+func (g *Client) Import(req *Request) (*Response, error) {
+	if req == nil {
 		return nil, ErrNilParamDereference
 	}
 
-	bip := &BulkImportParams{
-		Params: []*Params{param},
+	bip := &BulkImportRequest{
+		Requests: []*Request{req},
 	}
 	responses, err := g.ImportBulk(bip)
 	if err != nil {
@@ -199,27 +196,27 @@ func (g *GIFS) Import(param *Params) (*Response, error) {
 }
 
 // ImportSources is a convenience method that allows you to just specify
-// multiple media URLs without having to construct each `Params` object.
-func (g *GIFS) ImportSources(sources ...string) ([]*Response, error) {
+// multiple media URLs without having to construct each `Request` object.
+func (g *Client) ImportSources(sources ...string) ([]*Response, error) {
 	if len(sources) < 1 {
 		return nil, ErrExpectingAtLeastOneSource
 	}
 
-	preparedParams := []*Params{}
+	preparedRequest := []*Request{}
 	for _, source := range sources {
-		preparedParams = append(preparedParams, &Params{URL: source})
+		preparedRequest = append(preparedRequest, &Request{URL: source})
 	}
 
-	bip := &BulkImportParams{Params: preparedParams}
+	bip := &BulkImportRequest{Requests: preparedRequest}
 	return g.ImportBulk(bip)
 }
 
-type BulkImportParams struct {
+type BulkImportRequest struct {
 	ConcurrentImports uint
-	Params            []*Params
+	Requests          []*Request
 }
 
-func (p *Params) transformToImportBody() ([]byte, error) {
+func (p *Request) transformToImportBody() ([]byte, error) {
 	if p == nil {
 		return nil, ErrNilParamDereference
 	}
@@ -236,35 +233,31 @@ func copyHeaders(from, to http.Header) {
 	}
 }
 
-func (g *GIFS) doPOSTRequest(uri string, param *Params, headers http.Header) (*http.Response, error) {
-	byteSlice, err := param.transformToImportBody()
+func (g *Client) doPOSTRequest(uri string, req *Request, headers http.Header) (*http.Response, error) {
+	b, err := req.transformToImportBody()
 	if err != nil {
 		return nil, err
 	}
-	debugLogPrintf("byteSlice body %s for param: %+v\n", byteSlice, param)
-	req, err := http.NewRequest("POST", uri, bytes.NewReader(byteSlice))
+	debugLogPrintf("body %s for req: %+v", b, req)
+	httpReq, err := http.NewRequest("POST", uri, bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}
 
-	copyHeaders(headers, req.Header)
-	req.Header.Set("Content-Type", "application/json")
+	copyHeaders(headers, httpReq.Header)
+	httpReq.Header.Set("Content-Type", "application/json")
 	if g.apiKey != "" {
-		req.Header.Set("Gifs-Api-Key", g.apiKey)
+		httpReq.Header.Set("Gifs-Api-Key", g.apiKey)
 	}
 
-	return g.createdClient().Do(req)
+	return g.httpClient().Do(httpReq)
 }
 
-func (g *GIFS) doMultipartUpload() (*http.Response, error) {
+func (g *Client) doMultipartUpload() (*http.Response, error) {
 	return nil, errUnimplemented
 }
 
-type HTTPDoer interface {
-	Do(*http.Request) (*http.Response, error)
-}
-
-func (g *GIFS) createdClient() HTTPDoer {
+func (g *Client) httpClient() *http.Client {
 	if g.client != nil {
 		return g.client
 	}
@@ -280,11 +273,11 @@ const (
 
 type httpRequestJob struct {
 	uri     string
-	param   *Params
+	req     *Request
 	headers http.Header
 
 	uuid uint64
-	g    *GIFS
+	g    *Client
 	typ  jobType
 }
 
@@ -292,7 +285,7 @@ func (hj httpRequestJob) Id() interface{} {
 	return hj.uuid
 }
 
-func (hj httpRequestJob) gifsLiason() *GIFS {
+func (hj httpRequestJob) gifsLiason() *Client {
 	if hj.g != nil {
 		return hj.g
 	}
@@ -305,7 +298,7 @@ func (hj httpRequestJob) gifsLiason() *GIFS {
 }
 
 func (hj httpRequestJob) Do() (interface{}, error) {
-	res, err := hj.gifsLiason().doPOSTRequest(hj.uri, hj.param, hj.headers)
+	res, err := hj.gifsLiason().doPOSTRequest(hj.uri, hj.req, hj.headers)
 	debugLogPrintf("id: %v httpResposne: %v err: %v\n", hj.uuid, res, err)
 	if err != nil {
 		return nil, err
@@ -396,19 +389,19 @@ func (u64s uint64Slice) Swap(i, j int) {
 // ImportBulk is a convenience method that helps you import multiple media
 // in one pass, however import requests will be made in parallel to
 // the API. Responses per request will be matched by index/order of the requests.
-func (g *GIFS) ImportBulk(bip *BulkImportParams) ([]*Response, error) {
-	concurrentImports := defaultConcurrentImportsCount
+func (g *Client) ImportBulk(bip *BulkImportRequest) ([]*Response, error) {
+	var concurrentImports uint64 = defaultConcurrentImportsCount
 	if bip.ConcurrentImports > 0 {
 		concurrentImports = uint64(bip.ConcurrentImports)
 	}
 
-	maxResponseId := uint64(len(bip.Params))
+	maxResponseId := uint64(len(bip.Requests))
 	jobsBench := make(chan semalim.Job)
 	go func() {
 		defer close(jobsBench)
 		for i := uint64(0); i < maxResponseId; i++ {
-			param := bip.Params[i]
-			jobsBench <- httpRequestJob{uri: importEndpointURL, param: param, uuid: uint64(i)}
+			req := bip.Requests[i]
+			jobsBench <- httpRequestJob{uri: importEndpointURL, req: req, uuid: uint64(i)}
 		}
 	}()
 
