@@ -1,4 +1,4 @@
-package gifs_go
+package gifs
 
 import (
 	"bytes"

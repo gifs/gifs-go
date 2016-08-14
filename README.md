@@ -1,22 +1,17 @@
-## gifs\_go
+# gifs go client [![GoDoc](https://godoc.org/github.com/gifs/gifs-go?status.svg)](https://godoc.org/github.com/gifs/gifs-go)
 
-[![GoDoc](https://godoc.org/github.com/gifs/gifs_go?status.svg)](https://godoc.org/github.com/gifs/gifs_go)
+Golang package for interacting with the [gifs.com API](https://github.com/gifs/api) to transcode and import media into `.mp4`, `.jpg`, and `.gif` formats. Import all your videos by uploading or passing in any source. It is super easy to import media and integrate in your code.
 
-Go package for interacting with the gifs.com API for transcoding and importing
-media to make at least .MP4, .JPG, .GIF outputs.
+You can see full examples and all the convenience methods in these files:
 
-Import all your videos by uploading and by passing in any source.
+- [`examples/import.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
+- [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
+- [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
 
-It is super easy to import media and integrate in your code.
-Please see the examples below on how to import a single source, then in bulk
-each in one call. You can also see more usage and convenience methods in files:
-- `examples_test.go`
-- `gifs_test.go`
-- `gifs.go`
+### Usage Examples
 
-### Examples
+#### Include gifs package:
 
-For the examples below, include these imports as the predicates to have runnable examples:
 ```go
 
 package main
@@ -24,13 +19,11 @@ package main
 import (
 	"fmt"
 
-	gifs "github.com/gifs/gifs_go"
+	"github.com/gifs/gifs-go"
 )
 ```
 
-##### Show me the code:
-
-##### Import example
+#### Import Example
 
 [embedmd]:# (example_test.go go /func ExampleImport.*/ /\n}/)
 ```go
@@ -76,7 +69,7 @@ func ExampleImport() {
 }
 ```
 
-##### ImportBulk example
+#### ImportBulk Example
 
 [embedmd]:# (example_test.go go /func ExampleImportBulk.*/ /\n}/)
 ```go
@@ -116,3 +109,11 @@ func ExampleImportBulk() {
 	}
 }
 ```
+
+### Related Projects
+
+- [node.js client](https://github.com/gifs/gifs-api-node)
+- [golang reddit importer](https://github.com/gifs/api/tree/master/examples/reddit-importer)
+- [golang bulk uploader](https://github.com/gifs/api/tree/master/examples/bulk-uploader)
+
+We also have [code snippets in 13+ languages](https://github.com/gifs/api/blob/master/SNIPPETS.md) for importing media with the API.
