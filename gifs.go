@@ -12,7 +12,6 @@ import (
 	"os"
 	"sort"
 	"strconv"
-	"sync"
 
 	"github.com/odeke-em/semalim"
 )
@@ -64,37 +63,43 @@ func (mt MediaType) String() string {
 	return mt.Extension()
 }
 
-type Credentials struct {
-	APIKey string `json:"api_key,omitempty"`
-}
-
 type Client struct {
 	client *http.Client
-
-	// mu guards access to apiKey
-	mu     sync.Mutex
 	apiKey string
 }
 
-func (g *Client) SetAPIKey(apiKey string) {
-	g.mu.Lock()
-	g.apiKey = apiKey
-	g.mu.Unlock()
+type Option interface {
+	apply(*Client)
 }
 
-func New() (*Client, error) {
-	return &Client{}, nil
+type withAPIKey string
+
+func (k withAPIKey) apply(g *Client) {
+	g.apiKey = string(k)
 }
 
-func NewWithCredentials(cred *Credentials) (*Client, error) {
-	g, err := New()
-	if err != nil {
-		return nil, err
+func WithAPIKey(key string) Option {
+	return withAPIKey(key)
+}
+
+type withClient struct {
+	hc *http.Client
+}
+
+func (wc withClient) apply(g *Client) {
+	g.client = wc.hc
+}
+
+func WithHTTPClient(hc *http.Client) Option {
+	return withClient{hc}
+}
+
+func New(opts ...Option) (*Client, error) {
+	c := &Client{}
+	for _, o := range opts {
+		o.apply(c)
 	}
-	if cred != nil {
-		g.SetAPIKey(cred.APIKey)
-	}
-	return g, nil
+	return c, nil
 }
 
 type Trim struct {
@@ -285,20 +290,8 @@ func (hj httpRequestJob) Id() interface{} {
 	return hj.uuid
 }
 
-func (hj httpRequestJob) gifsLiason() *Client {
-	if hj.g != nil {
-		return hj.g
-	}
-
-	g, err := New()
-	if err != nil {
-		panic(err)
-	}
-	return g
-}
-
 func (hj httpRequestJob) Do() (interface{}, error) {
-	res, err := hj.gifsLiason().doPOSTRequest(hj.uri, hj.req, hj.headers)
+	res, err := hj.g.doPOSTRequest(hj.uri, hj.req, hj.headers)
 	debugLogPrintf("id: %v httpResposne: %v err: %v\n", hj.uuid, res, err)
 	if err != nil {
 		return nil, err
@@ -347,11 +340,13 @@ func categorizeParallelJobResponses(resultsChan chan semalim.Result, maxResponse
 		}
 
 		var finalRes *Response
-		wrapRes := res.(*wrapperResponse)
-		if wrapRes != nil {
-			finalRes = wrapRes.Success
-			if err == nil {
-				err = wrapRes.Errors
+		if res != nil {
+			wrapRes := res.(*wrapperResponse)
+			if wrapRes != nil {
+				finalRes = wrapRes.Success
+				if err == nil {
+					err = wrapRes.Errors
+				}
 			}
 		}
 
@@ -401,7 +396,7 @@ func (g *Client) ImportBulk(bip *BulkImportRequest) ([]*Response, error) {
 		defer close(jobsBench)
 		for i := uint64(0); i < maxResponseId; i++ {
 			req := bip.Requests[i]
-			jobsBench <- httpRequestJob{uri: importEndpointURL, req: req, uuid: uint64(i)}
+			jobsBench <- httpRequestJob{uri: importEndpointURL, req: req, uuid: uint64(i), g: g}
 		}
 	}()
 
