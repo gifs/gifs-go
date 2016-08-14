@@ -29,6 +29,8 @@ import (
 ##### Show me the code:
 
 ##### Import example
+
+[embedmd]:# (example_test.go go /func ExampleImport.*/ /\n}/)
 ```go
 func ExampleImport() {
 	g, err := gifs.New()
@@ -36,7 +38,7 @@ func ExampleImport() {
 		fmt.Printf("failed to initialize a new GIFS client, err=%v\n", err)
 		return
 	}
-	param := &gifs.Params{
+	param := &gifs.Request{
 		URL: "https://www.youtube.com/watch?v=D2EfpQiOQrY",
 		Trim: &gifs.Trim{
 			Start: 4.5,
@@ -73,6 +75,8 @@ func ExampleImport() {
 ```
 
 ##### ImportBulk example
+
+[embedmd]:# (example_test.go go /func ExampleImportBulk.*/ /\n}/)
 ```go
 func ExampleImportBulk() {
 	g, err := gifs.New()
@@ -81,8 +85,9 @@ func ExampleImportBulk() {
 		return
 	}
 
-	bulkParams := &gifs.BulkImportParams{
-		Params: []*gifs.Params{
+	bulkRequest := &gifs.BulkImportRequest{
+		ConcurrentImports: 3,
+		Requests: []*gifs.Request{
 			{
 				Title: "Desiigner -- Panda",
 				URL:   "https://www.youtube.com/watch?v=E5ONTXHS2mM",
@@ -96,13 +101,13 @@ func ExampleImportBulk() {
 		},
 	}
 
-	responses, err := g.ImportBulk(bulkParams)
+	responses, err := g.ImportBulk(bulkRequest)
 	if err != nil {
 		fmt.Printf("Failed to bulk import; err=%v\n", err)
 		return
 	}
 
-	resLen, bulksLen := len(responses), len(bulkParams.Params)
+	resLen, bulksLen := len(responses), len(bulkRequest.Requests)
 	if resLen != bulksLen {
 		fmt.Printf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, bulksLen)
 		return
