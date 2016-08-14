@@ -25,7 +25,7 @@ import (
 
 #### Import Example
 
-[embedmd]:# (examples/import.go go /func ExampleImport.*/ /\n}/)
+[embedmd]:# (example_test.go go /func ExampleImport.*/ /\n}/)
 ```go
 func ExampleImport() {
 	g, err := gifs.New()
@@ -71,7 +71,7 @@ func ExampleImport() {
 
 #### ImportBulk Example
 
-[embedmd]:# (examples/import.go go /func ExampleImportBulk.*/ /\n}/)
+[embedmd]:# (example_test.go go /func ExampleImportBulk.*/ /\n}/)
 ```go
 func ExampleImportBulk() {
 	g, err := gifs.New()
