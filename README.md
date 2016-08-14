@@ -1,18 +1,16 @@
-# gifs go
+# gifs go client [![GoDoc](https://godoc.org/github.com/gifs/gifs-go?status.svg)](https://godoc.org/github.com/gifs/gifs-go)
 
-[![GoDoc](https://godoc.org/github.com/gifs/gifs-go?status.svg)](https://godoc.org/github.com/gifs/gifs-go)
+Go package for interacting with the gifs.com API to transcode and import media into `.mp4`, `.jpg`, and of course `.gif` formats. Import all your videos by uploading or passing in any source. It is super easy to import media and integrate in your code.
 
-Go package for interacting with the gifs.com API for transcoding and importing media to `.mp4`, `.jpg`, `.gif` outputs. Import all your videos by uploading or passing in any source. It is super easy to import media and integrate in your code.
-
-## Examples
-
-You can also see more usage and convenience methods in files:
+You can see full examples and all the convenience methods in these files:
 
 - [`examples/import.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
 - [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
 - [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
 
-#### Include the package:
+## Usage Examples
+
+#### Include gifs package:
 
 ```go
 
@@ -21,7 +19,7 @@ package main
 import (
 	"fmt"
 
-	gifs "github.com/gifs/gifs-go"
+	"github.com/gifs/gifs-go"
 )
 ```
 
