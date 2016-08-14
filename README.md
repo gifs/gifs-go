@@ -1,5 +1,7 @@
 ## gifs\_go
 
+[![GoDoc](https://godoc.org/github.com/gifs/gifs_go?status.svg)](https://godoc.org/github.com/gifs/gifs_go)
+
 Go package for interacting with the gifs.com API for transcoding and importing
 media to make at least .MP4, .JPG, .GIF outputs.
 
