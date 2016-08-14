@@ -1,11 +1,11 @@
-package gifs_go_test
+package gifs_test
 
 import (
 	"errors"
 	"net/http"
 	"testing"
 
-	gifs "github.com/gifs/gifs_go"
+	gifs "github.com/gifs/gifs-go"
 )
 
 func newClient(t *testing.T) *gifs.Client {

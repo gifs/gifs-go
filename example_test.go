@@ -1,9 +1,9 @@
-package gifs_go_test
+package gifs_test
 
 import (
 	"fmt"
 
-	gifs "github.com/gifs/gifs_go"
+	gifs "github.com/gifs/gifs-go"
 )
 
 func ExampleImport() {

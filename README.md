@@ -1,22 +1,21 @@
-## gifs\_go
+# gifs go
 
-[![GoDoc](https://godoc.org/github.com/gifs/gifs_go?status.svg)](https://godoc.org/github.com/gifs/gifs_go)
+[![GoDoc](https://godoc.org/github.com/gifs/gifs-go?status.svg)](https://godoc.org/github.com/gifs/gifs-go)
 
-Go package for interacting with the gifs.com API for transcoding and importing
-media to make at least .MP4, .JPG, .GIF outputs.
+Go package for interacting with the gifs.com API for transcoding and importing media to `.mp4`, `.jpg`, `.gif` outputs. Import all your videos by uploading and by passing in any source. It is super easy to import media and integrate in your code.
 
-Import all your videos by uploading and by passing in any source.
+## Examples
 
-It is super easy to import media and integrate in your code.
-Please see the examples below on how to import a single source, then in bulk
-each in one call. You can also see more usage and convenience methods in files:
-- `examples_test.go`
-- `gifs_test.go`
-- `gifs.go`
+Please see the examples below on how to import a single source, then in bulk each in one call.
 
-### Examples
+You can also see more usage and convenience methods in files:
 
-For the examples below, include these imports as the predicates to have runnable examples:
+- [`example_test.go`](https://github.com/gifs/gifs-go/blob/master/example_test.go)
+- [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
+- [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
+
+#### Include the package:
+
 ```go
 
 package main
@@ -24,13 +23,13 @@ package main
 import (
 	"fmt"
 
-	gifs "github.com/gifs/gifs_go"
+	gifs "github.com/gifs/gifs-go"
 )
 ```
 
-##### Show me the code:
+#### Import example
 
-##### Import example
+[embedmd]:# (example_test.go go /func ExampleImport.*/ /\n}/)
 ```go
 func ExampleImport() {
 	g, err := gifs.New()
@@ -38,7 +37,7 @@ func ExampleImport() {
 		fmt.Printf("failed to initialize a new GIFS client, err=%v\n", err)
 		return
 	}
-	param := &gifs.Params{
+	param := &gifs.Request{
 		URL: "https://www.youtube.com/watch?v=D2EfpQiOQrY",
 		Trim: &gifs.Trim{
 			Start: 4.5,
@@ -74,7 +73,9 @@ func ExampleImport() {
 }
 ```
 
-##### ImportBulk example
+#### ImportBulk example
+
+[embedmd]:# (example_test.go go /func ExampleImportBulk.*/ /\n}/)
 ```go
 func ExampleImportBulk() {
 	g, err := gifs.New()
@@ -83,8 +84,9 @@ func ExampleImportBulk() {
 		return
 	}
 
-	bulkParams := &gifs.BulkImportParams{
-		Params: []*gifs.Params{
+	bulkRequest := &gifs.BulkImportRequest{
+		ConcurrentImports: 3,
+		Requests: []*gifs.Request{
 			{
 				Title: "Desiigner -- Panda",
 				URL:   "https://www.youtube.com/watch?v=E5ONTXHS2mM",
@@ -98,13 +100,13 @@ func ExampleImportBulk() {
 		},
 	}
 
-	responses, err := g.ImportBulk(bulkParams)
+	responses, err := g.ImportBulk(bulkRequest)
 	if err != nil {
 		fmt.Printf("Failed to bulk import; err=%v\n", err)
 		return
 	}
 
-	resLen, bulksLen := len(responses), len(bulkParams.Params)
+	resLen, bulksLen := len(responses), len(bulkRequest.Requests)
 	if resLen != bulksLen {
 		fmt.Printf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, bulksLen)
 		return
