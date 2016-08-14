@@ -1,9 +1,9 @@
-package gifs_test
+package main
 
 import (
 	"fmt"
 
-	gifs "github.com/gifs/gifs-go"
+	"github.com/gifs/gifs-go"
 )
 
 func ExampleImport() {
@@ -112,4 +112,10 @@ func ExampleImportBySources() {
 		fmt.Printf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, srcsLen)
 		return
 	}
+}
+
+func main() {
+	ExampleImport()
+	ExampleImportBulk()
+	ExampleImportBySources()
 }
