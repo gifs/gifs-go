@@ -4,9 +4,9 @@ Golang package for interacting with the [gifs.com API](https://github.com/gifs/a
 
 You can see full examples and all the convenience methods in these files:
 
-- [`examples/import.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
-- [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
-- [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
+- [`example_test.go`](example_test.go)
+- [`gifs_test.go`](gifs_test.go)
+- [`gifs.go`](gifs.go)
 
 ### Usage Examples
 
