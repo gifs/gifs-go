@@ -2,7 +2,6 @@ package gifs
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 )
@@ -17,7 +16,6 @@ func newClient(t *testing.T) *Client {
 }
 
 func TestNew(t *testing.T) {
-	fmt.Println("woat")
 	g := newClient(t)
 	if g == nil {
 		t.Errorf("expected non-nil Client")
