@@ -1,6 +1,8 @@
 package gifs_go_test
 
 import (
+	"errors"
+	"net/http"
 	"testing"
 
 	gifs "github.com/gifs/gifs_go"
@@ -66,6 +68,9 @@ func TestImportSources(t *testing.T) {
 
 func TestImport(t *testing.T) {
 	t.Parallel()
+	if testing.Short() {
+		t.Skip()
+	}
 
 	param := gifs.Request{
 		URL:   "https://camo.githubusercontent.com/cd1f1a4b10bb14133ae48db167919c418d455537/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f63646e2e676966732e636f6d2f67656e69652d6769746875622d616e696d6174696f6e2e6769663f763d34",
@@ -94,5 +99,34 @@ func TestImport(t *testing.T) {
 
 	if resp.File(gifs.MP4) == "" {
 		t.Errorf("expected at least an MP4 back")
+	}
+}
+
+type transport func(*http.Request) (*http.Response, error)
+
+func (t transport) RoundTrip(r *http.Request) (*http.Response, error) {
+	return t(r)
+}
+
+func TestOptions(t *testing.T) {
+	var apiKey string
+	var requests int
+	roundTrip := func(r *http.Request) (*http.Response, error) {
+		requests++
+		apiKey = r.Header.Get("Gifs-Api-Key")
+		return nil, errors.New("not implemented")
+	}
+	hc := &http.Client{Transport: transport(roundTrip)}
+	c, _ := gifs.New(gifs.WithAPIKey("foo"), gifs.WithHTTPClient(hc))
+
+	_, err := c.ImportSources("x")
+	if err != nil {
+		t.Errorf("want nil, got err %v", err)
+	}
+	if want, got := 1, requests; want != got {
+		t.Errorf("Requests: want %d, got %d", want, got)
+	}
+	if want, got := "foo", apiKey; want != got {
+		t.Errorf("API key: want %q, got %q", want, got)
 	}
 }
