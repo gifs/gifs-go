@@ -6,11 +6,9 @@ Go package for interacting with the gifs.com API for transcoding and importing m
 
 ## Examples
 
-Please see the examples below on how to import a single source, then in bulk each in one call.
-
 You can also see more usage and convenience methods in files:
 
-- [`example_test.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
+- [`examples/import.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
 - [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
 - [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
 
@@ -27,7 +25,7 @@ import (
 )
 ```
 
-#### Import example
+#### Import Example
 
 [embedmd]:# (example_test.go go /func ExampleImport.*/ /\n}/)
 ```go
@@ -73,7 +71,7 @@ func ExampleImport() {
 }
 ```
 
-#### ImportBulk example
+#### ImportBulk Example
 
 [embedmd]:# (example_test.go go /func ExampleImportBulk.*/ /\n}/)
 ```go
