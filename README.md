@@ -2,7 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/gifs/gifs-go?status.svg)](https://godoc.org/github.com/gifs/gifs-go)
 
-Go package for interacting with the gifs.com API for transcoding and importing media to `.mp4`, `.jpg`, `.gif` outputs. Import all your videos by uploading and by passing in any source. It is super easy to import media and integrate in your code.
+Go package for interacting with the gifs.com API for transcoding and importing media to `.mp4`, `.jpg`, `.gif` outputs. Import all your videos by uploading or passing in any source. It is super easy to import media and integrate in your code.
 
 ## Examples
 
@@ -10,7 +10,7 @@ Please see the examples below on how to import a single source, then in bulk eac
 
 You can also see more usage and convenience methods in files:
 
-- [`example_test.go`](https://github.com/gifs/gifs-go/blob/master/example_test.go)
+- [`example_test.go`](https://github.com/gifs/gifs_go/blob/master/examples/import.go)
 - [`gifs_test.go`](https://github.com/gifs/gifs-go/blob/master/gifs_test.go)
 - [`gifs.go`](https://github.com/gifs/gifs-go/blob/master/gifs.go)
 
