@@ -6,7 +6,7 @@ import (
 	gifs "github.com/gifs/gifs_go"
 )
 
-func newClient(t *testing.T) *gifs.GIFS {
+func newClient(t *testing.T) *gifs.Client {
 	g, err := gifs.New()
 	if err != nil {
 		t.Fatal(err)
@@ -18,7 +18,7 @@ func newClient(t *testing.T) *gifs.GIFS {
 func TestNew(t *testing.T) {
 	g := newClient(t)
 	if g == nil {
-		t.Errorf("expected non-nil GIFS handler")
+		t.Errorf("expected non-nil Client")
 	}
 }
 
@@ -67,7 +67,7 @@ func TestImportSources(t *testing.T) {
 func TestImport(t *testing.T) {
 	t.Parallel()
 
-	param := gifs.Params{
+	param := gifs.Request{
 		URL:   "https://camo.githubusercontent.com/cd1f1a4b10bb14133ae48db167919c418d455537/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f63646e2e676966732e636f6d2f67656e69652d6769746875622d616e696d6174696f6e2e6769663f763d34",
 		Title: "GIFS Genie",
 		Tags:  []string{"tests", "hello golang"},
