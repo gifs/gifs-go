@@ -137,7 +137,10 @@ type responseError struct {
 	Message string `json:"message,omitempty"`
 }
 
-func (re responseError) Error() string {
+func (re *responseError) Error() string {
+	if re == nil {
+		return ""
+	}
 	return re.Message
 }
 

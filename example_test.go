@@ -41,6 +41,7 @@ func ExampleImport() {
 		fmt.Printf("We've got an MP4 file at the bare minimum\n")
 	}
 
+	// Output:
 	// We've got a page alright
 	// We've got an embed page alright
 	// We've got files
