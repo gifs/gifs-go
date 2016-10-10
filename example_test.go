@@ -2,6 +2,7 @@ package gifs_test
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gifs/gifs-go"
 )
@@ -9,23 +10,37 @@ import (
 func ExampleImport() {
 	g, err := gifs.New()
 	if err != nil {
-		fmt.Printf("failed to initialize a new GIFS client, err=%v\n", err)
-		return
+		log.Fatalf("failed to initialize a new GIFS client, err=%v\n", err)
 	}
+
 	param := &gifs.Request{
-		URL: "https://www.youtube.com/watch?v=D2EfpQiOQrY",
+		URL: "https://www.youtube.com/watch?v=Vhh_GeBPOhs",
 		Trim: &gifs.Trim{
 			Start: 4.5,
-			End:   20.5,
+			End:   19.5,
 		},
-		Title: "Migos Dab",
-		Tags:  []string{"migos", "dab", "example test"},
+		Crop: &gifs.Crop{
+			X:      40,
+			Y:      10,
+			Width:  200,
+			Height: 200,
+		},
+
+		Title: "Developers developers developers",
+		Tags:  []string{"steve balmer", "steve turnt", "developers developers"},
+
+		CreatedFrom: "gifs-go-tests",
+
+		Attribution: &gifs.Attribution{
+			SiteName:     "gifs-developers",
+			SiteURL:      "https://github.com/gifs",
+			SiteUsername: "gifs",
+		},
 	}
 
 	res, err := g.Import(param)
 	if err != nil {
-		fmt.Printf("failed to import your media, err=%v\n", err)
-		return
+		log.Fatalf("failed to import your media, err=%v\n", err)
 	}
 
 	if res.Page != "" {
@@ -42,7 +57,7 @@ func ExampleImport() {
 	}
 
 	// Output:
-	// We've got a page alright
+	// We've got a page alright.
 	// We've got an embed page alright
 	// We've got files
 	// We've got an MP4 file at the bare minimum
@@ -51,8 +66,7 @@ func ExampleImport() {
 func ExampleImportBulk() {
 	g, err := gifs.New()
 	if err != nil {
-		fmt.Printf("failed to initialize a new GIFS client, err=%v\n", err)
-		return
+		log.Fatalf("failed to initialize a new GIFS client, err=%v\n", err)
 	}
 
 	bulkRequest := &gifs.BulkImportRequest{
@@ -73,14 +87,12 @@ func ExampleImportBulk() {
 
 	responses, err := g.ImportBulk(bulkRequest)
 	if err != nil {
-		fmt.Printf("Failed to bulk import; err=%v\n", err)
-		return
+		log.Fatalf("Failed to bulk import; err=%v\n", err)
 	}
 
 	resLen, bulksLen := len(responses), len(bulkRequest.Requests)
 	if resLen != bulksLen {
-		fmt.Printf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, bulksLen)
-		return
+		log.Fatalf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, bulksLen)
 	}
 }
 
@@ -104,13 +116,11 @@ func ExampleImportBySources() {
 
 	responses, err := g.ImportSources(sources...)
 	if err != nil {
-		fmt.Printf("Failed to bulk import; err=%v\n", err)
-		return
+		log.Fatalf("Failed to bulk import; err=%v\n", err)
 	}
 
 	resLen, srcsLen := len(responses), len(sources)
 	if resLen != srcsLen {
-		fmt.Printf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, srcsLen)
-		return
+		log.Fatalf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, srcsLen)
 	}
 }

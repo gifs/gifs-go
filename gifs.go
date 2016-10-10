@@ -32,36 +32,17 @@ const (
 	defaultConcurrentImportsCount = 10
 )
 
-func debugLogPrintf(s string, args ...interface{}) {
-	if debug {
-		log.Printf("[gifs] "+s, args...)
-	}
-}
-
-type MediaType uint
-
-const (
-	MP4 MediaType = 1 << iota
-	JPG
-	GIF
+var (
+	debugLogPrintf func(string, ...interface{}) = func() func(string, ...interface{}) {
+		if !debug {
+			// noop
+			return func(s string, args ...interface{}) {}
+		}
+		return func(s string, args ...interface{}) {
+			log.Printf("[gifs] "+s, args...)
+		}
+	}()
 )
-
-func (mt MediaType) Extension() string {
-	switch mt {
-	default:
-		return ""
-	case MP4:
-		return "mp4"
-	case JPG:
-		return "jpg"
-	case GIF:
-		return "gif"
-	}
-}
-
-func (mt MediaType) String() string {
-	return mt.Extension()
-}
 
 type Client struct {
 	client *http.Client
@@ -108,17 +89,50 @@ type Trim struct {
 }
 
 type Request struct {
-	Title  string   `json:"title,omitempty"`
-	URL    string   `json:"source,omitempty"`
-	APIKey string   `json:"api_key,omitempty"`
-	Tags   []string `json:"tags,omitempty"`
-	NSFW   bool     `json:"nsfw,omitempty"`
-	Trim   *Trim    `json:"trim,omitempty"`
+	// CreatedFrom when set tells the api whom
+	// it should tag the caller as for purposes
+	// of metric tracking and aggregation.
+	CreatedFrom string `json:"caller,omitempty"`
+
+	Title string `json:"title,omitempty"`
+
+	// URL is the HTTP based URI pointing to
+	// the media that is being transcoded.
+	URL string `json:"source,omitempty"`
+
+	// APIKey associates an authenticated user with
+	// their imported media for purposes of ownership,
+	// deals, special requests and many other good things.
+	// If you don't have an API key, you can get one from
+	// https://gifs.com/dashboard/api
+	APIKey string `json:"api_key,omitempty"`
+
+	// Tags are used for categorization of media
+	Tags []string `json:"tags,omitempty"`
+
+	// NSFW if set tells the API that this media is
+	// Not-Safe-For-Work or Not-Suitable-For-Work
+	NSFW bool `json:"nsfw,omitempty"`
+
+	// Trim defines how to clip/trim the input source media
+	// for example to trim the media from 10.45s to 22.3s
+	// set the start to 10.45 and end to 22.3
+	Trim *Trim `json:"trim,omitempty"`
 
 	// Only set media if you are performing an upload
 	media io.Reader
 
-	Attribution map[string]interface{} `json:"attribution,omitempty"`
+	// Attribution makes an association and gives
+	// credit to the creator of the media.
+	Attribution *Attribution `json:"attribution,omitempty"`
+
+	// Crop defines a rectangle of area of interest that the output media
+	// should be made first before any transcoding is done,
+	// referenced by an (x, y) situated at the top left corner of the rectangle.
+	// Note:
+	// * The value of (x+width) must be less than or equal to the width of the media
+	// * The value of (y+height) must be less than or equal to the height of the media
+	Crop *Crop `json:"crop,omitempty"`
 
 	callbackURI string `json:"-"`
 }

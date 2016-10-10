@@ -84,6 +84,15 @@ func ExampleImportBulk() {
 		ConcurrentImports: 3,
 		Requests: []*gifs.Request{
 			{
+				Trim: &gifs.Trim{
+				    Start: 40.9,
+				    End: 61.3
+				},
+				Crop: &gifs.Crop{
+				    Width: 200,
+				    Height: 150,
+				    X: 40
+				},
 				Title: "Desiigner -- Panda",
 				URL:   "https://www.youtube.com/watch?v=E5ONTXHS2mM",
 				Tags:  []string{"panda", "broads in atlanta", "phantom", "desiigner"},
@@ -117,3 +126,26 @@ func ExampleImportBulk() {
 - [golang bulk uploader](https://github.com/gifs/api/tree/master/examples/bulk-uploader)
 
 We also have [code snippets in 13+ languages](https://github.com/gifs/api/blob/master/SNIPPETS.md) for importing media with the API.
+
+![https://j.gifs.com/DR0Woy.gif](https://j.gifs.com/DR0Woy.gif)
+![https://j.gifs.com/Mj9WEQ.gif](https://j.gifs.com/Mj9WEQ.gif)
+
+![https://j.gifs.com/Wn8oVg.gif](https://j.gifs.com/Wn8oVg.gif)
+
+
+![50 Million dollars??](https://j.gifs.com/vgjLLM.gif)
+![https://j.gifs.com/zmp552@small.gif](https://j.gifs.com/zmp552@small.gif)
+
+![https://j.gifs.com/k5oX3X.gif](https://j.gifs.com/k5oX3X.gif)
+
+![https://j.gifs.com/KO69nr.gif](https://j.gifs.com/KO69nr.gif)
+
+![https://gifs.com/gif/Z4Wrp2](https://j.gifs.com/Z4Wrp2.gif)
+![https://gifs.com/gif/mwEQ29](https://j.gifs.com/mwEQ29.gif)
+
+![https://gifs.com/gif/82vpWg](https://j.gifs.com/82vpWg.gif)
+
+![https://j.gifs.com/Wn8p0J.gif](https://j.gifs.com/Wn8p0J.gif)
+
+
+![https://j.gifs.com/ERk850.gif](https://j.gifs.com/ERk850.gif)
