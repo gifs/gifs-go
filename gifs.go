@@ -134,6 +134,10 @@ type Request struct {
 	// * The value of (y+height) must be less than or equal to the height of the media
 	Crop *Crop `json:"crop,omitempty"`
 
+	// Effects defines alterations that will be applied to the final media
+	// in an area that may be defined by a section or a timeline.
+	Effects *Effects `json:"effects,omitempty"`
+
 	callbackURI string `json:"-"`
 }
 

@@ -57,7 +57,7 @@ func ExampleImport() {
 	}
 
 	// Output:
-	// We've got a page alright.
+	// We've got a page alright
 	// We've got an embed page alright
 	// We've got files
 	// We've got an MP4 file at the bare minimum
@@ -123,4 +123,87 @@ func ExampleImportBySources() {
 	if resLen != srcsLen {
 		log.Fatalf("responsesLength(%d) does not match requestsLength (%d)\n", resLen, srcsLen)
 	}
+}
+
+func ExampleEffects() {
+	g, err := gifs.New()
+	if err != nil {
+		log.Fatalf("failed to initialize a new GIFS client, err=%v\n", err)
+	}
+
+	param := &gifs.Request{
+		URL: "https://www.youtube.com/watch?v=ybMEINc5KRw",
+		Trim: &gifs.Trim{
+			Start: 45.5,
+			End:   55.5,
+		},
+
+		Title: "No Chill - Vic Mensa & Skrillex",
+		Tags:  []string{"vic mensa", "skrillex"},
+
+		CreatedFrom: "gifs-go-tests",
+
+		Effects: &gifs.Effects{
+			Overlay: []*gifs.Overlay{
+				{
+					X: "100", Y: "100",
+					Source: "https://cdn.gifs.com/spinning.gif",
+					Timeline: &gifs.Timeline{
+						Start: 1.2,
+						End:   8.5,
+					},
+				},
+				{
+					X: "0", Y: "0", Source: "https://cdn.gifs.com/thug-life-demo.png",
+				},
+			},
+			Flip: []*gifs.Flip{
+				{Horizontal: true, Vertical: true},
+			},
+			Invert: []*gifs.Invert{
+				{
+					Timeline: &gifs.Timeline{Start: 0.5, End: 9},
+					Section: &gifs.Section{
+						X: "50", Y: "50", Width: 60, Height: 60,
+					},
+				},
+				{
+					Timeline: &gifs.Timeline{Start: 5, End: 10},
+					Section: &gifs.Section{
+						X: "50", Y: "60", Width: 40, Height: 80,
+					},
+				},
+			},
+		},
+
+		Attribution: &gifs.Attribution{
+			SiteName:     "gifs-developers",
+			SiteURL:      "https://github.com/gifs",
+			SiteUsername: "gifs",
+		},
+	}
+
+	res, err := g.Import(param)
+	if err != nil {
+		log.Fatalf("failed to import your media, err=%v\n", err)
+	}
+
+	if res.Page != "" {
+		fmt.Printf("We've got a page alright\n")
+	}
+	if res.Embed != "" {
+		fmt.Printf("We've got an embed page alright\n")
+	}
+	if res.HasFiles() {
+		fmt.Printf("We've got files\n")
+	}
+	if res.File(gifs.MP4) != "" {
+		fmt.Printf("We've got an MP4 file at the bare minimum\n")
+	}
+
+	// Output:
+	// We've got a page alright
+	// We've got an embed page alright
+	// We've got files
+	// We've got an MP4 file at the bare minimum
 }
