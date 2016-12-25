@@ -9,6 +9,7 @@ type Effects struct {
 	Pad     []*Pad     `json:"pad,omitempty"`
 	Flip    []*Flip    `json:"flip,omitempty"`
 	Invert  []*Invert  `json:"invert,omitempty"`
+	Caption []*Caption `json:"caption,omitempty"`
 }
 
 // Timeline defines the duration on a timescale
@@ -39,6 +40,18 @@ type Overlay struct {
 	// LoopCount if set defines the number of times
 	// that an animated overlay will loop for.
 	LoopCount int `json:"loop_count,omitempty"`
+}
+
+type Caption struct {
+	X           string    `json:"x,omitempty"`
+	Y           string    `json:"y,omitempty"`
+	Text        string    `json:"text,omitempty"`
+	TextColor   string    `json:"text_color,omitempty"`
+	Font        string    `json:"font,omitempty"`
+	YPadding    string    `json:"y_padding,omitempty"`
+	XPadding    string    `json:"x_padding,omitempty"`
+	LineSpacing float32   `json:"line_spacing,omitempty"`
+	Timeline    *Timeline `json:"timeline,omitempty"`
 }
 
 type Pad struct {

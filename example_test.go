@@ -144,6 +144,22 @@ func ExampleEffects() {
 		CreatedFrom: "gifs-go-tests",
 
 		Effects: &gifs.Effects{
+			Caption: []*gifs.Caption{
+				{
+					X: "10", Y: "32",
+					Text: "This is a caption",
+					Font: "montserrat",
+					Timeline: &gifs.Timeline{
+						Start: 2.1,
+						End:   3.4,
+					},
+				},
+				{
+					X: "100", Y: "32",
+					Text: "aloha ola bonjour",
+					Font: "impact",
+				},
+			},
 			Overlay: []*gifs.Overlay{
 				{
 					X: "100", Y: "100",
